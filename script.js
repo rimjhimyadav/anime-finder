@@ -37,7 +37,7 @@ let heroAnime = null;
 let popupAnime = null;
 let requestNumber = 0;
 
-// anilist uses graphql, so we send a query saying which fields we want
+// graphql query for anilist
 const query = `
   query ($page: Int, $search: String, $sort: [MediaSort], $genre: String, $status: MediaStatus) {
     Page(page: $page, perPage: 24) {
@@ -64,11 +64,10 @@ const query = `
   }
 `;
 
-// the api gives a lot of data, we only keep what we need
 function makeAnime(item) {
   let synopsis = "No synopsis available.";
   if (item.description) {
-    synopsis = item.description.replace(/<[^>]*>/g, ""); // remove html tags like <br>
+    synopsis = item.description.replace(/<[^>]*>/g, ""); // remove <br> tags
   }
 
   let trailer = "";
@@ -81,17 +80,27 @@ function makeAnime(item) {
     studio = item.studios.nodes[0].name;
   }
 
+  let score = null;
+  if (item.averageScore) {
+    score = (item.averageScore / 10).toFixed(1);
+  }
+
+  let format = "";
+  if (item.format) {
+    format = item.format.replace("_", " ");
+  }
+
   return {
     id: item.id,
     title: item.title.english || item.title.romaji,
     image: item.coverImage.extraLarge,
     banner: item.bannerImage,
-    score: item.averageScore ? (item.averageScore / 10).toFixed(1) : null,
+    score: score,
     popularity: item.popularity,
     episodes: item.episodes,
     duration: item.duration,
     year: item.seasonYear,
-    format: item.format ? item.format.replace("_", " ") : "",
+    format: format,
     status: statusNames[item.status] || "-",
     genres: item.genres,
     synopsis: synopsis,
@@ -138,7 +147,7 @@ function getVariables() {
 }
 
 async function loadAnime(addMore) {
-  // remember which request this is, so an old slow one can't overwrite a new one
+  // so old requests dont show up if user clicks fast
   requestNumber++;
   const thisRequest = requestNumber;
 
@@ -253,7 +262,7 @@ function createCard(anime, inMyList) {
   body.appendChild(genres);
 
   if (inMyList) {
-    // on my list show a status dropdown and a remove button
+    // my list cards have dropdown + remove btn
     const actions = document.createElement("div");
     actions.className = "d-flex gap-1 mt-auto";
 
@@ -290,7 +299,7 @@ function createCard(anime, inMyList) {
     btn.className = "btn btn-sm btn-purple w-100 mt-auto add-btn";
     btn.dataset.id = anime.id;
     btn.onclick = function (e) {
-      e.stopPropagation(); // so the popup doesn't open
+      e.stopPropagation();
       toggleList(anime);
     };
     body.appendChild(btn);
@@ -310,12 +319,10 @@ function createCard(anime, inMyList) {
 function getInfoText(anime) {
   const parts = [];
   if (anime.year) parts.push(anime.year);
-  if (anime.episodes) parts.push(anime.episodes + (anime.episodes === 1 ? " ep" : " eps"));
+  if (anime.episodes) parts.push(anime.episodes + " eps");
   if (anime.status) parts.push(anime.status);
   return parts.join(" · ");
 }
-
-// ----- my list -----
 
 function findInList(id) {
   for (let i = 0; i < myList.length; i++) {
@@ -363,7 +370,6 @@ function changeStatus(id, status) {
   }
 }
 
-// update every "+ My List" button on the page
 function updateButtons(parent) {
   const buttons = parent.querySelectorAll(".add-btn");
   for (let i = 0; i < buttons.length; i++) {
@@ -401,13 +407,10 @@ function showMyList() {
   }
 }
 
-// ----- hero banner -----
-
 async function loadHero() {
   try {
     const result = await fetchAnime({ page: 1, sort: ["TRENDING_DESC"] });
 
-    // pick the first one that has a banner image
     heroAnime = result.list[0];
     for (let i = 0; i < result.list.length; i++) {
       if (result.list[i].banner) {
@@ -418,7 +421,7 @@ async function loadHero() {
 
     document.getElementById("hero").style.backgroundImage = "url(" + heroAnime.banner + ")";
     document.getElementById("hero-title").textContent = heroAnime.title;
-    document.getElementById("hero-info").textContent = (heroAnime.score ? "⭐ " + heroAnime.score + " · " : "") + getInfoText(heroAnime);
+    document.getElementById("hero-info").textContent = "⭐ " + heroAnime.score + " · " + getInfoText(heroAnime);
     document.getElementById("hero-desc").textContent = heroAnime.synopsis;
     updateButtons(document);
   } catch (error) {
@@ -426,15 +429,17 @@ async function loadHero() {
   }
 }
 
-// ----- popup -----
-
 function openPopup(anime) {
   popupAnime = anime;
 
   document.getElementById("popup-banner").style.backgroundImage = anime.banner ? "url(" + anime.banner + ")" : "none";
   document.getElementById("popup-cover").src = anime.image;
   document.getElementById("popup-title").textContent = anime.title;
-  document.getElementById("popup-info").textContent = (anime.score ? "⭐ " + anime.score + " · " : "") + getInfoText(anime);
+  let info = getInfoText(anime);
+  if (anime.score) {
+    info = "⭐ " + anime.score + " · " + info;
+  }
+  document.getElementById("popup-info").textContent = info;
   document.getElementById("popup-synopsis").textContent = anime.synopsis;
 
   const genres = document.getElementById("popup-genres");
@@ -448,7 +453,11 @@ function openPopup(anime) {
 
   document.getElementById("d-format").textContent = anime.format || "-";
   document.getElementById("d-episodes").textContent = anime.episodes || "?";
-  document.getElementById("d-duration").textContent = anime.duration ? anime.duration + " min" : "-";
+  if (anime.duration) {
+    document.getElementById("d-duration").textContent = anime.duration + " min";
+  } else {
+    document.getElementById("d-duration").textContent = "-";
+  }
   document.getElementById("d-status").textContent = anime.status;
   document.getElementById("d-studio").textContent = anime.studio;
   document.getElementById("d-popularity").textContent = anime.popularity.toLocaleString() + " fans";
@@ -485,8 +494,6 @@ function showToast(text) {
   document.getElementById("toast-text").textContent = text;
   toast.show();
 }
-
-// ----- tabs and search -----
 
 function setTab(tabName) {
   currentTab = tabName;
@@ -572,7 +579,6 @@ document.getElementById("popup-status").onchange = function () {
   changeStatus(popupAnime.id, this.value);
 };
 
-// bootstrap closes the popup with esc or clicking outside
 popup.addEventListener("hidden.bs.modal", function () {
   popupAnime = null;
 });
