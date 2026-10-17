@@ -1,0 +1,191 @@
+body {
+  font-family: "Nunito", sans-serif;
+  background-color: #13111c;
+}
+
+.navbar {
+  background-color: #0d0b14;
+  border-bottom: 1px solid #2a2540;
+}
+
+/* purple color */
+.text-purple {
+  color: #a78bfa;
+}
+
+.bg-purple {
+  background-color: #8b5cf6 !important;
+}
+
+.btn-purple {
+  background-color: #8b5cf6;
+  border-color: #8b5cf6;
+  color: white;
+  font-weight: 700;
+}
+
+.btn-purple:hover {
+  background-color: #7c3aed;
+  border-color: #7c3aed;
+  color: white;
+}
+
+.add-btn.added {
+  background-color: #3b3554;
+  border-color: #3b3554;
+  color: white;
+}
+
+.form-control,
+.form-select {
+  background-color: #1d1a2b;
+  border-color: #2f2a47;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #8b5cf6;
+  box-shadow: none;
+}
+
+/* hero banner */
+#hero {
+  position: relative;
+  min-height: 430px;
+  display: flex;
+  align-items: flex-end;
+  padding: 40px 0;
+  background-color: #1d1a2b;
+  background-size: cover;
+  background-position: center;
+}
+
+#hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #13111c 5%, rgba(19, 17, 28, 0.6) 50%, rgba(19, 17, 28, 0.2));
+}
+
+.hero-content {
+  position: relative;
+}
+
+#hero-desc {
+  color: #d4d0e4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* tabs */
+.nav-pills .nav-link {
+  color: #b4aed0;
+  background-color: #221f33;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.chip-btn.active {
+  background-color: transparent;
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+/* cards */
+.anime-card {
+  background-color: #1d1a2b;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.anime-card:hover {
+  transform: translateY(-5px);
+}
+
+.anime-card img,
+.skeleton-img {
+  height: 260px;
+  object-fit: cover;
+}
+
+.card-title {
+  font-weight: 700;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.score-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+.format-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+/* genre tags */
+.badge.text-bg-secondary {
+  background-color: #2f2a47 !important;
+  color: #c4b5fd !important;
+}
+
+/* popup */
+.modal-content {
+  background-color: #1d1a2b;
+}
+
+.modal .btn-close {
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  padding: 8px;
+}
+
+.modal .bg-body-tertiary {
+  background-color: #151222 !important;
+}
+
+#popup-banner {
+  height: 180px;
+  background-color: #2a2540;
+  background-size: cover;
+  background-position: center;
+}
+
+#popup-cover {
+  width: 140px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 3px solid #1d1a2b;
+  margin-top: -70px;
+}
+
+#toast {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+@media (max-width: 576px) {
+  .anime-card img,
+  .skeleton-img {
+    height: 210px;
+  }
+
+  #popup-cover {
+    width: 100px;
+    height: 145px;
+  }
+}
