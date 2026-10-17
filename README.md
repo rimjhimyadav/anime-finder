@@ -2,6 +2,8 @@
 
 Anime search app made with HTML, CSS and JavaScript. Uses the free [AniList API](https://docs.anilist.co) (no API key needed).
 
+![demo](demo/demo.gif)
+
 ## Features
 
 - big banner with the #1 trending anime
